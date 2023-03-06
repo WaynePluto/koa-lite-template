@@ -1,0 +1,23 @@
+{
+  "name": "koa-server",
+  "version": "1.0.0",
+  "license": "MIT",
+  "scripts": {
+    "dev": "tsx watch app.ts",
+    "build": "npm run clear && esbuild src/app.ts --sourcemap --bundle --outdir=dist --platform=node --minify",
+    "start": "node --enable-source-maps ./dist/app.js",
+    "clear": "rimraf dist"
+  },
+  "dependencies": {
+    "koa": "^2.14.1"
+  },
+  "devDependencies": {
+    "@types/koa": "^2.13.5",
+    "@types/node": "^18.14.5",
+    "esbuild": "^0.17.10",
+    "koa-compose": "^4.1.0",
+    "rimraf": "^4.3.0",
+    "tsx": "^3.12.3",
+    "typescript": "^4.9.5"
+  }
+}
