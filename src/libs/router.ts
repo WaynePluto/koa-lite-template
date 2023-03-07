@@ -20,7 +20,7 @@ export default class Router {
   private pathMiddlewares: PathMethodFuncMap = {};
 
   use(path: string, method: '*' | HttpMethod, ...middlewares: Middleware[]) {
-    path = formatPath(path)
+    path = formatPath(path);
     middlewares.forEach(middleware => {
       if (!this.pathMiddlewares[path]) {
         this.pathMiddlewares[path] = {};
@@ -42,7 +42,11 @@ export default class Router {
         path = formatPath(path);
         const url = prefix + path;
         if (this.routes[url]) {
-          throw new Error(`Duplicate route:${url} definitions`);
+          if (this.routes[url][methodKey]) {
+            throw new Error(`Duplicate route:${url} definitions`);
+          } else {
+            this.routes[url][methodKey] = callbacks;
+          }
         } else {
           this.routes[url] = {
             [methodKey]: callbacks

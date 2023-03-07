@@ -3,12 +3,13 @@
   "version": "1.0.0",
   "license": "MIT",
   "scripts": {
-    "dev": "tsx watch app.ts",
+    "dev": "tsx watch src/app.ts",
     "build": "npm run clear && esbuild src/app.ts --sourcemap --bundle --outdir=dist --platform=node --minify",
     "start": "node --enable-source-maps ./dist/app.js",
     "clear": "rimraf dist"
   },
   "dependencies": {
+    "joi": "^17.8.3",
     "koa": "^2.14.1"
   },
   "devDependencies": {
