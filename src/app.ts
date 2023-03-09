@@ -2,6 +2,7 @@ import Koa from 'koa';
 import bodyParseJSON from './middlewares/body-parse-json';
 import catchError from './middlewares/catch-error';
 import { initRouter } from './router';
+// import "reflect-metadata"
 
 const app = new Koa();
 

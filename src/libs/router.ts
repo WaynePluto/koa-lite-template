@@ -62,7 +62,11 @@ export default class Router {
       const method = ctx.method.toLowerCase();
       const controllers = this.routes[ctx.path]?.[method] || [];
       if (!controllers.length) {
-        ctx.body = `${ctx.method} ${ctx.path} Not Found`;
+        ctx.body = {
+          code: 404,
+          data:{},
+          message:`${ctx.method} ${ctx.path} Not Found`
+        };
         return;
       }
       const commonMiddlewares = this.pathMiddlewares[ctx.path]?.['*'] || [];

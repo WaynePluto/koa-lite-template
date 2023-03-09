@@ -9,8 +9,10 @@
     "clear": "rimraf dist"
   },
   "dependencies": {
-    "joi": "^17.8.3",
-    "koa": "^2.14.1"
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.0",
+    "koa": "^2.14.1",
+    "reflect-metadata": "^0.1.13"
   },
   "devDependencies": {
     "@types/koa": "^2.13.5",
