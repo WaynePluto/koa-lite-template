@@ -1,15 +1,15 @@
 import { Middleware } from 'koa';
-import { validator } from '../../middlewares/validator';
+import { validateQuery } from '../../middlewares/validator';
 import { router } from '../../router';
 import { UserRepository } from './model';
-import { AddUserQuery } from './validator/add.validator';
+import { type AddUserQuery, addUserValidator } from './validator/add.validator';
 
 export function initUserRoute() {
   const prefix = 'user';
   router.use(prefix, '*', middlewares);
   const route = router.createRoute(prefix);
   route.get('/', getUsers);
-  route.post('/', validator(AddUserQuery), addUser)
+  route.post('/', validateQuery(addUserValidator), addUser);
   route.get('/info', getUserInfo);
 }
 
@@ -18,7 +18,7 @@ const middlewares: Middleware = async (ctx, next) => {
 };
 
 const addUser: Middleware = async (ctx, next) => {
-  const query = ctx.query as any as AddUserQuery;
+  const query: AddUserQuery = ctx.query as any;
   ctx.body = { code: 1, data: { name: query.name } };
   await next();
 };

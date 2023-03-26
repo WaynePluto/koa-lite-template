@@ -1,5 +1,6 @@
 import type { Context, Next } from 'koa';
 
+
 export default function bodyParseJSON() {
   const getBody = ({ req }: Context) => {
     return new Promise(resolve => {
@@ -24,8 +25,8 @@ export default function bodyParseJSON() {
   };
 
   return async (ctx: Context, next: Next) => {
-    const body = await getBody(ctx)
-    // console.log('===body:',body);
+    const body:any = await getBody(ctx)
+    ctx.request.body = body
     await next();
   };
 }
