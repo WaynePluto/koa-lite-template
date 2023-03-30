@@ -4,12 +4,15 @@
   "license": "MIT",
   "scripts": {
     "dev": "tsx watch src/app.ts",
-    "build": "npm run clear && esbuild src/app.ts --sourcemap --bundle --outdir=dist --platform=node --minify",
+    "_build": "npm run clear && esbuild src/app.ts --sourcemap --bundle --outdir=dist --platform=node --minify",
+    "build": "npm run clear && node esbuild.config.js",
     "start": "node --enable-source-maps ./dist/app.js",
     "clear": "rimraf dist"
   },
   "dependencies": {
+    "knex": "^2.4.2",
     "koa": "^2.14.1",
+    "mysql2": "^3.2.0",
     "zod": "^3.21.4"
   },
   "devDependencies": {

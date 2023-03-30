@@ -5,8 +5,9 @@ export default function catchError() {
     try {
       await next();
     } catch (error) {
-      console.log('error:', error);
-      ctx.throw(500);
+      console.log('===server error:', error);
+
+      ctx.throw(500, { error });
     }
   };
 }
