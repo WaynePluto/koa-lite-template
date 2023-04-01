@@ -64,8 +64,7 @@ export default class Router {
       if (!controllers.length) {
         ctx.body = {
           code: 404,
-          data:{},
-          message:`${ctx.method} ${ctx.path} Not Found`
+          message: `${ctx.method} ${ctx.path} Not Found`
         };
         return;
       }

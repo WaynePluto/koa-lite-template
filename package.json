@@ -4,10 +4,10 @@
   "license": "MIT",
   "scripts": {
     "dev": "tsx watch src/app.ts",
-    "_build": "npm run clear && esbuild src/app.ts --sourcemap --bundle --outdir=dist --platform=node --minify",
     "build": "npm run clear && node esbuild.config.js",
     "start": "node --enable-source-maps ./dist/app.js",
-    "clear": "rimraf dist"
+    "clear": "rimraf dist",
+    "init": "node scripts/create-model.js && node scripts/create-controller.js"
   },
   "dependencies": {
     "knex": "^2.4.2",

@@ -8,5 +8,9 @@
     "outDir": "dist",
     "moduleResolution": "nodenext",
     "esModuleInterop": true,
-  }
+  },
+  "include": [
+    "src/**/*.d.ts",
+    "src/**/*.ts",
+  ]
 }
