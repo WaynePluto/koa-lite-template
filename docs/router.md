@@ -6,7 +6,7 @@
 
 ```ts
 // router.ts
-import Router from "./libs/router";
+import Router from './libs/router';
 export const router = new Router();
 ```
 
@@ -16,8 +16,9 @@ export const router = new Router();
 // user/controller.ts
 import { router } from '../../router';
 const prefix = 'user';
-// 定义路由中间件，第一个参数指定路由比如 /,/info等，第二个参数指定路由方法
+// 定义路由中间件，第一个参数指定路由比如 /user,/user/list 等，第二个参数指定路由方法
 router.use(prefix, '*', middlewares);
+router.use(prefix + '/list', '*', middlewares);
 // 定义路由组
 const route = router.createRoute(prefix);
 ```
@@ -27,6 +28,6 @@ const route = router.createRoute(prefix);
 ```ts
 // 在路由分组上配置处理中间件，不支持动态路由
 route.get('/', getUsers);
-route.post('/', validator(AddUserQuery), addUser)
+route.post('/', validator(AddUserQuery), addUser);
 route.get('/info', getUserInfo);
 ```

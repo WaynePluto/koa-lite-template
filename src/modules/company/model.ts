@@ -9,9 +9,11 @@ interface CompanyModel {
 }
 
 export class CompanyRepository {
-  constructor(private readonly db: Knex) {}
+  constructor(readonly db: Knex) {
+    this.queryBuilder = db<CompanyModel, CompanyModel[]>('company');
+  }
 
-  private readonly queryBuilder = this.db<CompanyModel, CompanyModel[]>('company');
+  private queryBuilder;
 
   create(data: Partial<Omit<CompanyModel, 'id'>>) {
     return this.queryBuilder.insert(data);

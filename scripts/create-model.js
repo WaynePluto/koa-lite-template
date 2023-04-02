@@ -23,7 +23,7 @@ for (const sqlFile of sqlFiles) {
       return { name, type };
     });
 
-    const modelFilePath = path.join(__dirname, '..', 'src', 'modules', tableName, 'model.auto.ts');
+    const modelFilePath = path.join(__dirname, '..', 'src', 'modules', tableName, 'model.ts');
     const modelDirPath = path.dirname(modelFilePath);
 
     // 如果目录不存在则创建目录
@@ -88,9 +88,11 @@ interface ${ModelName} {
 }
 
 export class ${ClassName} {
-  constructor(private readonly db: Knex) {}
+  constructor(readonly db: Knex) {
+    this.queryBuilder = db<${ModelName}, ${ModelName}[]>('${tableName}');
+  }
 
-  private readonly queryBuilder = this.db<${ModelName}, ${ModelName}[]>('${tableName}');
+  private queryBuilder;
 
   create(data: Partial<Omit<${ModelName}, 'id'>>) {
     return this.queryBuilder.insert(data);

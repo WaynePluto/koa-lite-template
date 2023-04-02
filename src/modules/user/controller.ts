@@ -6,7 +6,8 @@ import { UserRepository } from './model';
 
 export function initUserRoute() {
   const prefix = 'user';
-  router.use(prefix, '*', middlewares);
+  router.use(prefix, '*', initUserRepo);
+  router.use(prefix + '/list', '*', initUserRepo);
 
   const route = router.createRoute(prefix);
 
@@ -22,7 +23,7 @@ const repo = {
   userRepo: null as UserRepository | null
 };
 
-const middlewares: Middleware = async (ctx, next) => {
+const initUserRepo: Middleware = async (ctx, next) => {
   if (!repo.userRepo) {
     repo.userRepo = new UserRepository(ctx.knex);
   }

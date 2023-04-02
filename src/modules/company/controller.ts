@@ -6,7 +6,8 @@ import { CompanyRepository } from './model';
 
 export function initCompanyRoute() {
   const prefix = 'company';
-  router.use(prefix, '*', middlewares);
+  router.use(prefix, '*', initCompanyRepo);
+  router.use(prefix + '/list', '*', initCompanyRepo);
 
   const route = router.createRoute(prefix);
 
@@ -22,7 +23,7 @@ const repo = {
   companyRepo: null as CompanyRepository | null
 };
 
-const middlewares: Middleware = async (ctx, next) => {
+const initCompanyRepo: Middleware = async (ctx, next) => {
   if (!repo.companyRepo) {
     repo.companyRepo = new CompanyRepository(ctx.knex);
   }

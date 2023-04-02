@@ -23,7 +23,7 @@ for (const sqlFile of sqlFiles) {
       return { name, type };
     });
 
-    const modelFilePath = path.join(__dirname, '..', 'src', 'modules', tableName, 'controller.auto.ts');
+    const modelFilePath = path.join(__dirname, '..', 'src', 'modules', tableName, 'controller.ts');
     const modelDirPath = path.dirname(modelFilePath);
 
     // 如果目录不存在则创建目录
@@ -98,7 +98,8 @@ import { ${ClassName} } from './model';
 
 export function init${TableName}Route() {
   const prefix = '${tableName}';
-  router.use(prefix, '*', middlewares);
+  router.use(prefix, '*', init${TableName}Repo);
+  router.use(prefix + '/list', '*', init${TableName}Repo);
 
   const route = router.createRoute(prefix);
 
@@ -114,7 +115,7 @@ const repo = {
   ${tableName}Repo: null as ${ClassName} | null
 };
 
-const middlewares: Middleware = async (ctx, next) => {
+const init${TableName}Repo: Middleware = async (ctx, next) => {
   if (!repo.${tableName}Repo) {
     repo.${tableName}Repo = new ${ClassName}(ctx.knex);
   }

@@ -10,9 +10,11 @@ interface UserModel {
 }
 
 export class UserRepository {
-  constructor(private readonly db: Knex) {}
+  constructor(readonly db: Knex) {
+    this.queryBuilder = db<UserModel, UserModel[]>('user');
+  }
 
-  private readonly queryBuilder = this.db<UserModel, UserModel[]>('user');
+  private queryBuilder;
 
   create(data: Partial<Omit<UserModel, 'id'>>) {
     return this.queryBuilder.insert(data);
