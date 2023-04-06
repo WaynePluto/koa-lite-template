@@ -21,4 +21,4 @@ yarn build
 yarn start
 ```
 
-### [custom lite router](./packages/lib-router/docs/router.md)
+### [custom lite router](./docs/router.md)

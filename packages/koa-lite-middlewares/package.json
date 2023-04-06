@@ -1,0 +1,25 @@
+{
+  "name": "koa-lite-middlewares",
+  "version": "0.0.1",
+  "license": "MIT",
+  "types": "./src/lib.ts",
+  "files": [
+    "src",
+    "dist"
+  ],
+  "main": "./dist/lib.js",
+  "scripts": {
+    "build": "npm run clear && node esbuild.config.js",
+    "clear": "rimraf dist"
+  },
+  "dependencies": {
+    "koa": "^2.14.1",
+    "koa-compose": "^4.1.0"
+  },
+  "devDependencies": {
+    "@types/koa": "^2.13.5",
+    "@types/node": "^18.14.5",
+    "esbuild": "^0.17.10",
+    "rimraf": "^4.3.0"
+  }
+}

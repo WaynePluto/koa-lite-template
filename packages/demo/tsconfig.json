@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ES2022",
+    "strict": true,
+    "skipLibCheck": true,
+    "allowSyntheticDefaultImports": true,
+    "outDir": "dist",
+    "moduleResolution": "nodenext",
+    "esModuleInterop": true,
+  },
+  "include": [
+    "src/**/*.d.ts",
+    "src/**/*.ts",
+  ]
+}
