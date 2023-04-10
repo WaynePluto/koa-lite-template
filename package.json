@@ -15,6 +15,7 @@
     "build:demo": "yarn workspace demo build",
     "start:demo": "yarn workspace demo start",
     "create:mysql": "yarn workspace demo-mysql run create",
-    "dev:mysql": "yarn workspace demo-mysql run dev"
+    "dev:mysql": "yarn workspace demo-mysql run dev",
+    "dev:mongo": "yarn workspace demo-mongo run dev"
   }
 }
