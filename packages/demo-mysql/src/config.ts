@@ -3,9 +3,9 @@ export const config = {
     client: 'mysql2',
     connection: {
       host: 'localhost',
-      database: 'koa-lite',
-      user: 'koa-lite',
-      password: 'hs7B5A2D6TfPMiCK'
+      database: 'koa_lite',
+      user: 'koa_server',
+      password: 'koa_pass'
     }
   }
 };

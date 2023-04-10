@@ -1,13 +1,11 @@
 import { Middleware } from 'koa';
 import { z } from 'zod';
-import { validateBody, validateQuery } from '../../middlewares/validator';
+import { validateBody, validateQuery } from 'koa-lite-middlewares';
 import { router } from '../../router';
 import { CompanyRepository } from './model';
 
 export function initCompanyRoute() {
   const prefix = 'company';
-  router.use(prefix, '*', initCompanyRepo);
-  router.use(prefix + '/list', '*', initCompanyRepo);
 
   const route = router.createRoute(prefix);
 
@@ -16,19 +14,8 @@ export function initCompanyRoute() {
   route.patch('/', validateBody(upateValidator), updateCompany);
   route.delete('/', validateQuery(idValidator), deleteCompany);
 
-  route.get('/list', getCompanyList);
+  route.get('/list', validateQuery(pageValidator), getCompanyList);
 }
-
-const repo = {
-  companyRepo: null as CompanyRepository | null
-};
-
-const initCompanyRepo: Middleware = async (ctx, next) => {
-  if (!repo.companyRepo) {
-    repo.companyRepo = new CompanyRepository(ctx.knex);
-  }
-  await next();
-};
 
 const createValidator = z.object({
   uuid: z.string().optional(),
@@ -36,8 +23,10 @@ const createValidator = z.object({
   created_time: z.date().optional(),
   deleted_time: z.date().optional(),
 });
+
 const createCompany: Middleware = async (ctx, next) => {
-  ctx.body = await repo.companyRepo?.create(ctx.request.body);
+  const companyRepo = new CompanyRepository(ctx.knex);
+  ctx.body = await companyRepo.create(ctx.request.body);
   await next();
 };
 
@@ -47,7 +36,8 @@ const idValidator = z.object({
 
 const getCompany: Middleware = async (ctx, next) => {
   const query = ctx.query as any as z.infer<typeof idValidator>;
-  ctx.body = await repo.companyRepo?.findById(query.id);
+  const companyRepo = new CompanyRepository(ctx.knex);
+  ctx.body = await companyRepo.findById(query.id);
   await next();
 };
 
@@ -58,20 +48,36 @@ const upateValidator = z.object({
   created_time: z.date().optional(),
   deleted_time: z.date().optional(),
 });
+
 const updateCompany: Middleware = async (ctx, next) => {
   const param = ctx.request.body as any as z.infer<typeof upateValidator>;
-  ctx.body = await repo.companyRepo?.updateById(param.id, param);
+  const companyRepo = new CompanyRepository(ctx.knex);
+  ctx.body = await companyRepo.updateById(param.id, param);
   await next();
 };
 
 const deleteCompany: Middleware = async (ctx, next) => {
   const query = ctx.query as any as z.infer<typeof idValidator>;
-  ctx.body = await repo.companyRepo?.deleteById(query.id);
+  const companyRepo = new CompanyRepository(ctx.knex);
+  ctx.body = await companyRepo.deleteById(query.id);
   await next();
 };
 
+const pageValidator = z.object({
+  page: z
+    .string()
+    .transform(val => Number(val))
+    .refine(val => val > 0, 'page has to be greater than 0'),
+  pageSize: z
+    .string()
+    .transform(val => Number(val))
+    .refine(val => val > 0, 'pageSize has to be greater than 0')
+});
+
 const getCompanyList: Middleware = async (ctx, next) => {
-  ctx.body = await repo.companyRepo?.getList();
+  const query = ctx.query as any as z.infer<typeof pageValidator>;
+  const companyRepo = new CompanyRepository(ctx.knex);
+  ctx.body = await companyRepo.getList(query.page, query.pageSize);
   await next();
 };
 

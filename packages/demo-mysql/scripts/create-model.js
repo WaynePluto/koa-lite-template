@@ -88,18 +88,19 @@ interface ${ModelName} {
 }
 
 export class ${ClassName} {
-  constructor(readonly db: Knex) {
-    this.queryBuilder = db<${ModelName}, ${ModelName}[]>('${tableName}');
-  }
+  constructor(readonly db: Knex) {}
 
-  private queryBuilder;
+  private get queryBuilder() {
+    return this.db<${ModelName}, ${ModelName}[]>('${tableName}');
+  }
 
   create(data: Partial<Omit<${ModelName}, 'id'>>) {
     return this.queryBuilder.insert(data);
   }
 
-  getList() {
-    return this.queryBuilder.select();
+  getList(page: number, pageSize: number) {
+    const offset = (page - 1) * pageSize;
+    return this.queryBuilder.select().limit(pageSize).offset(offset);
   }
 
   findById(id: number | string) {

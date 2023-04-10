@@ -10,18 +10,19 @@ interface UserModel {
 }
 
 export class UserRepository {
-  constructor(readonly db: Knex) {
-    this.queryBuilder = db<UserModel, UserModel[]>('user');
-  }
+  constructor(readonly db: Knex) {}
 
-  private queryBuilder;
+  private get queryBuilder() {
+    return this.db<UserModel, UserModel[]>('user');
+  }
 
   create(data: Partial<Omit<UserModel, 'id'>>) {
     return this.queryBuilder.insert(data);
   }
 
-  getList() {
-    return this.queryBuilder.select();
+  getList(page: number, pageSize: number) {
+    const offset = (page - 1) * pageSize;
+    return this.queryBuilder.select().limit(pageSize).offset(offset);
   }
 
   findById(id: number | string) {

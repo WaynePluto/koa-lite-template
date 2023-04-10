@@ -4,7 +4,7 @@ import { router } from '../../router';
 export function initRoute() {
   const prefix = 'template';
   router.use(prefix, '*', () => {});
-  router.use(prefix + '/', 'get', () => {});
+  router.use(prefix + '/list', 'get', () => {});
   const route = router.createRoute(prefix);
   route.get('/', handle);
 }

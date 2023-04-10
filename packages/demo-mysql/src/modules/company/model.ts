@@ -9,18 +9,19 @@ interface CompanyModel {
 }
 
 export class CompanyRepository {
-  constructor(readonly db: Knex) {
-    this.queryBuilder = db<CompanyModel, CompanyModel[]>('company');
-  }
+  constructor(readonly db: Knex) {}
 
-  private queryBuilder;
+  private get queryBuilder() {
+    return this.db<CompanyModel, CompanyModel[]>('company');
+  }
 
   create(data: Partial<Omit<CompanyModel, 'id'>>) {
     return this.queryBuilder.insert(data);
   }
 
-  getList() {
-    return this.queryBuilder.select();
+  getList(page: number, pageSize: number) {
+    const offset = (page - 1) * pageSize;
+    return this.queryBuilder.select().limit(pageSize).offset(offset);
   }
 
   findById(id: number | string) {

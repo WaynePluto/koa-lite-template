@@ -8,10 +8,13 @@
     "packages/*"
   ],
   "scripts": {
-    "build:router": "yarn workspace koa-lite-router build",
-    "build:libs": "yarn workspace koa-lite-middlewares build",
+    "build:router": "yarn workspace koa-lite-router run build",
+    "build:middlewares": "yarn workspace koa-lite-middlewares run build",
+    "build:libs": "npm run build:router && npm run build:middlewares",
     "dev:demo": "yarn workspace demo dev",
     "build:demo": "yarn workspace demo build",
-    "start:demo": "yarn workspace demo start"
+    "start:demo": "yarn workspace demo start",
+    "create:mysql": "yarn workspace demo-mysql run create",
+    "dev:mysql": "yarn workspace demo-mysql run dev"
   }
 }

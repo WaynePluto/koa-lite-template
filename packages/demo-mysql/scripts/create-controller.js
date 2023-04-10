@@ -92,14 +92,12 @@ function generateModelContent(tableName, tableFields) {
 
   return `import { Middleware } from 'koa';
 import { z } from 'zod';
-import { validateBody, validateQuery } from '../../middlewares/validator';
+import { validateBody, validateQuery } from 'koa-lite-middlewares';
 import { router } from '../../router';
 import { ${ClassName} } from './model';
 
 export function init${TableName}Route() {
   const prefix = '${tableName}';
-  router.use(prefix, '*', init${TableName}Repo);
-  router.use(prefix + '/list', '*', init${TableName}Repo);
 
   const route = router.createRoute(prefix);
 
@@ -108,25 +106,16 @@ export function init${TableName}Route() {
   route.patch('/', validateBody(upateValidator), update${TableName});
   route.delete('/', validateQuery(idValidator), delete${TableName});
 
-  route.get('/list', get${TableName}List);
+  route.get('/list', validateQuery(pageValidator), get${TableName}List);
 }
-
-const repo = {
-  ${tableName}Repo: null as ${ClassName} | null
-};
-
-const init${TableName}Repo: Middleware = async (ctx, next) => {
-  if (!repo.${tableName}Repo) {
-    repo.${tableName}Repo = new ${ClassName}(ctx.knex);
-  }
-  await next();
-};
 
 const createValidator = z.object({
   ${noIdFields}
 });
+
 const create${TableName}: Middleware = async (ctx, next) => {
-  ctx.body = await repo.${tableName}Repo?.create(ctx.request.body);
+  const ${tableName}Repo = new ${ClassName}(ctx.knex);
+  ctx.body = await ${tableName}Repo.create(ctx.request.body);
   await next();
 };
 
@@ -136,27 +125,44 @@ const idValidator = z.object({
 
 const get${TableName}: Middleware = async (ctx, next) => {
   const query = ctx.query as any as z.infer<typeof idValidator>;
-  ctx.body = await repo.${tableName}Repo?.findById(query.id);
+  const ${tableName}Repo = new ${ClassName}(ctx.knex);
+  ctx.body = await ${tableName}Repo.findById(query.id);
   await next();
 };
 
 const upateValidator = z.object({
   ${fieldDefinitions}
 });
+
 const update${TableName}: Middleware = async (ctx, next) => {
   const param = ctx.request.body as any as z.infer<typeof upateValidator>;
-  ctx.body = await repo.${tableName}Repo?.updateById(param.id, param);
+  const ${tableName}Repo = new ${ClassName}(ctx.knex);
+  ctx.body = await ${tableName}Repo.updateById(param.id, param);
   await next();
 };
 
 const delete${TableName}: Middleware = async (ctx, next) => {
   const query = ctx.query as any as z.infer<typeof idValidator>;
-  ctx.body = await repo.${tableName}Repo?.deleteById(query.id);
+  const ${tableName}Repo = new ${ClassName}(ctx.knex);
+  ctx.body = await ${tableName}Repo.deleteById(query.id);
   await next();
 };
 
+const pageValidator = z.object({
+  page: z
+    .string()
+    .transform(val => Number(val))
+    .refine(val => val > 0, 'page has to be greater than 0'),
+  pageSize: z
+    .string()
+    .transform(val => Number(val))
+    .refine(val => val > 0, 'pageSize has to be greater than 0')
+});
+
 const get${TableName}List: Middleware = async (ctx, next) => {
-  ctx.body = await repo.${tableName}Repo?.getList();
+  const query = ctx.query as any as z.infer<typeof pageValidator>;
+  const ${tableName}Repo = new ${ClassName}(ctx.knex);
+  ctx.body = await ${tableName}Repo.getList(query.page, query.pageSize);
   await next();
 };
 

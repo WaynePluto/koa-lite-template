@@ -1,9 +1,8 @@
 import Koa from 'koa';
 import { config } from './config';
-import bodyParseJSON from './middlewares/body-parse-json';
-import catchError from './middlewares/catch-error';
 import initKnex from './middlewares/knex';
 import initRouter from './router';
+import { bodyParseJSON, catchError } from 'koa-lite-middlewares';
 
 const app = new Koa();
 

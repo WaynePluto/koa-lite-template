@@ -1,13 +1,11 @@
 import { Middleware } from 'koa';
 import { z } from 'zod';
-import { validateBody, validateQuery } from '../../middlewares/validator';
+import { validateBody, validateQuery } from 'koa-lite-middlewares';
 import { router } from '../../router';
 import { UserRepository } from './model';
 
 export function initUserRoute() {
   const prefix = 'user';
-  router.use(prefix, '*', initUserRepo);
-  router.use(prefix + '/list', '*', initUserRepo);
 
   const route = router.createRoute(prefix);
 
@@ -16,19 +14,8 @@ export function initUserRoute() {
   route.patch('/', validateBody(upateValidator), updateUser);
   route.delete('/', validateQuery(idValidator), deleteUser);
 
-  route.get('/list', getUserList);
+  route.get('/list', validateQuery(pageValidator), getUserList);
 }
-
-const repo = {
-  userRepo: null as UserRepository | null
-};
-
-const initUserRepo: Middleware = async (ctx, next) => {
-  if (!repo.userRepo) {
-    repo.userRepo = new UserRepository(ctx.knex);
-  }
-  await next();
-};
 
 const createValidator = z.object({
   uuid: z.string().optional(),
@@ -37,8 +24,10 @@ const createValidator = z.object({
   name: z.string().optional(),
   created_time: z.date().optional(),
 });
+
 const createUser: Middleware = async (ctx, next) => {
-  ctx.body = await repo.userRepo?.create(ctx.request.body);
+  const userRepo = new UserRepository(ctx.knex);
+  ctx.body = await userRepo.create(ctx.request.body);
   await next();
 };
 
@@ -48,7 +37,8 @@ const idValidator = z.object({
 
 const getUser: Middleware = async (ctx, next) => {
   const query = ctx.query as any as z.infer<typeof idValidator>;
-  ctx.body = await repo.userRepo?.findById(query.id);
+  const userRepo = new UserRepository(ctx.knex);
+  ctx.body = await userRepo.findById(query.id);
   await next();
 };
 
@@ -60,20 +50,36 @@ const upateValidator = z.object({
   name: z.string().optional(),
   created_time: z.date().optional(),
 });
+
 const updateUser: Middleware = async (ctx, next) => {
   const param = ctx.request.body as any as z.infer<typeof upateValidator>;
-  ctx.body = await repo.userRepo?.updateById(param.id, param);
+  const userRepo = new UserRepository(ctx.knex);
+  ctx.body = await userRepo.updateById(param.id, param);
   await next();
 };
 
 const deleteUser: Middleware = async (ctx, next) => {
   const query = ctx.query as any as z.infer<typeof idValidator>;
-  ctx.body = await repo.userRepo?.deleteById(query.id);
+  const userRepo = new UserRepository(ctx.knex);
+  ctx.body = await userRepo.deleteById(query.id);
   await next();
 };
 
+const pageValidator = z.object({
+  page: z
+    .string()
+    .transform(val => Number(val))
+    .refine(val => val > 0, 'page has to be greater than 0'),
+  pageSize: z
+    .string()
+    .transform(val => Number(val))
+    .refine(val => val > 0, 'pageSize has to be greater than 0')
+});
+
 const getUserList: Middleware = async (ctx, next) => {
-  ctx.body = await repo.userRepo?.getList();
+  const query = ctx.query as any as z.infer<typeof pageValidator>;
+  const userRepo = new UserRepository(ctx.knex);
+  ctx.body = await userRepo.getList(query.page, query.pageSize);
   await next();
 };
 

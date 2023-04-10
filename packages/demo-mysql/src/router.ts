@@ -1,4 +1,4 @@
-import Router from './libs/router';
+import Router from 'koa-lite-router';
 import { initCompanyRoute } from './modules/company/controller';
 import { initUserRoute } from './modules/user/controller';
 
