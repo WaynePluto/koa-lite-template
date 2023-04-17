@@ -5,8 +5,8 @@ import { initUserRoute } from './modules/user/controller';
 export const router = new Router();
 
 export default function initRouter() {
-  initUserRoute();
-  initCompanyRoute();
+  initUserRoute(router);
+  initCompanyRoute(router);
 
   // other routes...
   return router.init();

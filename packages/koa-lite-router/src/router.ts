@@ -1,84 +1,102 @@
-import { METHODS } from 'http';
-import { type Middleware } from 'koa';
-import compose from 'koa-compose';
+import { METHODS } from 'http'
+import { type Middleware } from 'koa'
+import compose from 'koa-compose'
 
-type HttpMethod = 'get' | 'post' | 'put' | 'patch' | 'delete';
+type HttpMethod = 'get' | 'post' | 'put' | 'patch' | 'delete'
 
 type PathMethodFuncMap = {
   [path: string]: {
-    [method: string]: Middleware[];
-  };
-};
+    [method: string]: Middleware[]
+  }
+}
+/** http方法、中间件字典 */
+type MethodMiddlewareMap = Map<RegExp, Middleware[]>
 
+/** 路由、方法字典 */
+type PathMethodMap = Map<RegExp, MethodMiddlewareMap>
+
+/** 局部路由 */
 type Route = {
-  [key in HttpMethod]: (path: string, ...callbacks: Middleware[]) => void;
-};
+  [key in HttpMethod]: (path: string, ...callbacks: Middleware[]) => void
+}
 
 export default class Router {
   constructor() {}
-  private routes: PathMethodFuncMap = {};
-  private pathMiddlewares: PathMethodFuncMap = {};
+  /** 局部路由，添加的中间件，精确匹配路径与请求方法 */
+  private routeMiddlewares: PathMethodFuncMap = {}
+  /** 全局路由对象添加的中间件，正则匹配路径 */
+  private regPathMiddlewares: PathMethodMap = new Map()
 
-  use(path: string, method: '*' | HttpMethod, ...middlewares: Middleware[]) {
-    path = formatPath(path);
-    middlewares.forEach(middleware => {
-      if (!this.pathMiddlewares[path]) {
-        this.pathMiddlewares[path] = {};
+  use(reg: RegExp = /.*/, method: RegExp = /.*/, ...middlewares: Middleware[]) {
+    const regMidMap = this.regPathMiddlewares.get(reg)
+    if (regMidMap) {
+      const methodMids = regMidMap.get(method)
+      if (methodMids) {
+        methodMids.push(...middlewares)
+      } else {
+        regMidMap.set(method, middlewares)
       }
-      const middlewares = this.pathMiddlewares[path][method] || [];
-      if (middlewares.length === 0) {
-        middlewares.push(middleware);
-      }
-      this.pathMiddlewares[path][method] = middlewares;
-    });
+    } else {
+      const regMap: MethodMiddlewareMap = new Map()
+      const methodMids: Middleware[] = middlewares
+      regMap.set(method, methodMids)
+      this.regPathMiddlewares.set(reg, regMap)
+    }
   }
 
   createRoute(prefix = '/') {
-    const route = {} as Route;
+    const route = {} as Route
     METHODS.forEach(method => {
-      const methodKey = method.toLowerCase() as HttpMethod;
+      const methodKey = method.toLowerCase() as HttpMethod
       route[methodKey] = (path, ...callbacks) => {
-        prefix = formatPath(prefix);
-        path = formatPath(path);
-        const url = prefix + path;
-        if (this.routes[url]) {
-          if (this.routes[url][methodKey]) {
-            throw new Error(`Duplicate route:${url} definitions`);
+        prefix = formatPath(prefix)
+        path = formatPath(path)
+        const url = prefix + path
+        if (this.routeMiddlewares[url]) {
+          if (this.routeMiddlewares[url][methodKey]) {
+            throw new Error(`Duplicate route:${url} definitions`)
           } else {
-            this.routes[url][methodKey] = callbacks;
+            this.routeMiddlewares[url][methodKey] = callbacks
           }
         } else {
-          this.routes[url] = {
+          this.routeMiddlewares[url] = {
             [methodKey]: callbacks
-          };
+          }
         }
-      };
-    });
-    return route;
+      }
+    })
+    return route
   }
 
   init(): Middleware {
     return async (ctx, next) => {
-      const method = ctx.method.toLowerCase();
-      const controllers = this.routes[ctx.path]?.[method] || [];
+      const method = ctx.method.toLowerCase()
+      const controllers = this.routeMiddlewares[ctx.path]?.[method] || []
       if (!controllers.length) {
-        ctx.body = {
-          code: 404,
-          message: `${ctx.method} ${ctx.path} Not Found`
-        };
-        return;
+        ctx.body = `${ctx.method} ${ctx.path} Not Found`
+        return
       }
-      const commonMiddlewares = this.pathMiddlewares[ctx.path]?.['*'] || [];
-      const methodMiddlewares = this.pathMiddlewares[ctx.path]?.[method] || [];
-      const middlewares = [...commonMiddlewares, ...methodMiddlewares, ...controllers];
-      const fn = compose(middlewares);
-      await fn(ctx, next);
-    };
+      const regMids: Middleware[] = []
+
+      this.regPathMiddlewares.forEach((methodMap, pathReg) => {
+        if (pathReg.test(ctx.path)) {
+          methodMap.forEach((mids, methodReg) => {
+            if (methodReg.test(method)) {
+              regMids.push(...mids)
+            }
+          })
+        }
+      })
+
+      const middlewares = [...regMids, ...controllers]
+      const fn = compose(middlewares)
+      await fn(ctx, next)
+    }
   }
 }
 
 function formatPath(path: string) {
-  path = path.startsWith('/') ? path : `/${path}`;
-  path = path.endsWith('/') ? path.slice(0, -1) : path;
-  return path;
+  path = path.startsWith('/') ? path : `/${path}`
+  path = path.endsWith('/') ? path.slice(0, -1) : path
+  return path
 }

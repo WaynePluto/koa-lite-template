@@ -16,9 +16,8 @@ export const router = new Router();
 // user/controller.ts
 import { router } from '../../router';
 const prefix = 'user';
-// 定义路由中间件，第一个参数指定路由比如 /user,/user/list 等，第二个参数指定路由方法
-router.use(prefix, '*', middlewares);
-router.use(prefix + '/list', '*', middlewares);
+// 定义路由中间件，第一个参数使用正则匹配指定路由比如 /user,/user/list 等，第二个参数匹配路由方法
+router.use(/^\/user/, /.*/, middlewares);
 // 定义路由组
 const route = router.createRoute(prefix);
 ```

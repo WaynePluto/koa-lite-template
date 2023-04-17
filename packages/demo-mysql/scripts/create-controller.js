@@ -93,10 +93,10 @@ function generateModelContent(tableName, tableFields) {
   return `import { Middleware } from 'koa';
 import { z } from 'zod';
 import { validateBody, validateQuery } from 'koa-lite-middlewares';
-import { router } from '../../router';
+import type Router from 'koa-lite-router'
 import { ${ClassName} } from './model';
 
-export function init${TableName}Route() {
+export function init${TableName}Route(router: Router) {
   const prefix = '${tableName}';
 
   const route = router.createRoute(prefix);

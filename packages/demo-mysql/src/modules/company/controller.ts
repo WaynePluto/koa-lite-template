@@ -1,10 +1,10 @@
 import { Middleware } from 'koa';
 import { z } from 'zod';
 import { validateBody, validateQuery } from 'koa-lite-middlewares';
-import { router } from '../../router';
+import type Router from 'koa-lite-router'
 import { CompanyRepository } from './model';
 
-export function initCompanyRoute() {
+export function initCompanyRoute(router: Router) {
   const prefix = 'company';
 
   const route = router.createRoute(prefix);
