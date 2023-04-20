@@ -1,5 +1,5 @@
-import { Knex } from 'knex';
-import Koa from 'koa';
+import type { Knex } from 'knex';
+import type { SSE } from '../middlewares/sse';
 
 interface Body {
   [key: string]: any;
@@ -12,5 +12,6 @@ declare module 'koa' {
 
   interface ExtendableContext {
     knex: Knex;
+    sse:SSE
   }
 }
