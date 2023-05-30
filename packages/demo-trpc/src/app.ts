@@ -1,19 +1,20 @@
-import Koa from 'koa';
-import initRouter from './router';
-import { bodyParseJSON, catchError } from 'koa-lite-middlewares';
-import { createKoaMiddleware, createContext } from './middlewares/trpc'
-import { appRouter } from './trpc-router';
+import Koa from 'koa'
+import initRouter from './router'
+import { bodyParseJSON, catchError } from 'koa-lite-middlewares'
+import { createKoaMiddleware } from './middlewares/trpc-koa-adaptor'
+import { appRouter } from './trpc-router'
 
-const app = new Koa();
+const app = new Koa()
 
-app.use(catchError());
+app.use(catchError())
 
-app.use(createKoaMiddleware({ router: appRouter, createContext, prefix: '/trpc' }))
+// use trpc, next middlewares will not work if router enter this trpc middleware
+app.use(createKoaMiddleware({ router: appRouter, prefix: '/trpc' }))
 
-app.use(bodyParseJSON());
-
-app.use(initRouter({ exclude: '/trpc' }));
+// other router middlewares
+app.use(bodyParseJSON())
+app.use(initRouter())
 
 app.listen(3000, () => {
-  console.log('Server running at http://127.0.0.1:3000/');
-});
+  console.log('Server is running at http://127.0.0.1:3000/')
+})

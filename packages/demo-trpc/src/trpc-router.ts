@@ -1,8 +1,7 @@
 import { initTRPC } from '@trpc/server'
 import z from 'zod'
-import { Context } from './middlewares/trpc'
 
-export const t = initTRPC.context<Context>().create()
+export const t = initTRPC.context().create()
 
 export const appRouter = t.router({
   getUser: t.procedure
@@ -12,7 +11,6 @@ export const appRouter = t.router({
       })
     )
     .query(opts => {
-      console.log('====opts:', opts.input)
       return { id: opts.input.id, name: 'Tom' }
     }),
 

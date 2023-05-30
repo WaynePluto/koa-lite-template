@@ -21,7 +21,6 @@ type Route = {
 }
 
 export default class Router {
-  constructor() { }
   /** 局部路由，添加的中间件，精确匹配路径与请求方法 */
   private routeMiddlewares: PathMethodFuncMap = {}
   /** 全局路由对象添加的中间件，正则匹配路径 */
@@ -68,13 +67,8 @@ export default class Router {
     return route
   }
 
-  init({ exclude }: { exclude: string }): Middleware {
+  init(): Middleware {
     return async (ctx, next) => {
-      if (ctx.path.startsWith(exclude)) {
-        await next()
-        return
-      }
-
       const method = ctx.method.toLowerCase()
       const controllers = this.routeMiddlewares[ctx.path]?.[method] || []
       if (!controllers.length) {
